@@ -290,14 +290,22 @@ namespace DNWS
             _parent.Log("Server started at port " + _port + " in " + threadingMode + " threading mode.");
             while (true)
             {
-                try
+                try 
                 {
                     // Wait for client
                     clientSocket = serverSocket.Accept();
                     // Get one, show some info
                     _parent.Log("Client accepted:" + clientSocket.RemoteEndPoint.ToString());
                     HTTPProcessor hp = new HTTPProcessor(clientSocket, _parent);
-                    hp.Process();
+
+                    /******* HW2 Assignment ********/
+                    if(Program.Configuration["Threading"].ToLower() == "multi") { //Multi Thread
+                        Thread thread = new Thread(new ParameterizedThreadStart(ThreadProc));
+                        thread.Start(new TaskInfo(hp));
+                    } else { //Single Thread
+                        hp.Process(); 
+                    }
+
                 }
                 catch (Exception ex)
                 {
